@@ -1,0 +1,751 @@
+﻿<Window x:Class="ININ.Alliances.Examples.ConferenceExample.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModel="clr-namespace:ININ.Alliances.Examples.ConferenceExample.ViewModel"
+        xmlns:supporting="clr-namespace:ININ.Alliances.Examples.ConferenceExample.View.Supporting"
+        mc:Ignorable="d" Title="Conference Example" Height="600" Width="940" Closing="MainWindow_OnClosing"
+        d:DataContext="{d:DesignInstance viewModel:MainViewModel}" Icon="/ConferenceExample;component/General.ico">
+    <Window.Resources>
+        <Style TargetType="TextBox">
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Height" Value="22" />
+        </Style>
+        <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Margin" Value="2" />
+        </Style>
+        <Style TargetType="TextBlock" x:Key="AuthLabels" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="Width" Value="60" />
+            <Setter Property="DockPanel.Dock" Value="Left" />
+        </Style>
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}" x:Key="AuthBoxStyle">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsConnectionInProgress}" Value="True">
+                    <Setter Property="IsEnabled" Value="False" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                    <Setter Property="IsEnabled" Value="False" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="PasswordBox" x:Key="AuthPwBoxStyle">
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Height" Value="22" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsConnectionInProgress}" Value="True">
+                    <Setter Property="IsEnabled" Value="False" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsConnected}" Value="True">
+                    <Setter Property="IsEnabled" Value="False" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Border" x:Key="SectionHeaderBorderStyle">
+            <Setter Property="Margin" Value="0,3" />
+            <Setter Property="BorderBrush" Value="DarkGray" />
+            <Setter Property="BorderThickness" Value="0,0,0,1" />
+        </Style>
+        <Style TargetType="TextBlock" x:Key="SectionHeaderTextStyle">
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="0,1" />
+        </Style>
+        <Style TargetType="CheckBox" x:Key="MediaTypeOptionStyle">
+            <Setter Property="Margin" Value="2,1" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style TargetType="TextBlock" x:Key="FileFormatOptionStyle">
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="Margin" Value="3,1" />
+        </Style>
+        <Style TargetType="Button" x:Key="ConnectButtonStyle">
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Margin" Value="4" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsConnectionInProgress}" Value="True">
+                    <Setter Property="IsEnabled" Value="False" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="DockPanel" x:Key="ExportOperationStyle">
+            <Setter Property="IsEnabled" Value="False" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=DataContext.IsConnected}" Value="True">
+                    <Setter Property="IsEnabled" Value="True" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style TargetType="Button" x:Key="ExportButtonStyle">
+            <Setter Property="Height" Value="22" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="Padding" Value="8,2" />
+            <Setter Property="Margin" Value="2,6" />
+        </Style>
+        <Style TargetType="TextBox" x:Key="LogStyle">
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="Background" Value="#09000000"></Setter>
+        </Style>
+        <Style TargetType="GridViewColumnHeader">
+            <Setter Property="Padding" Value="7,2" />
+        </Style>
+
+        <Style x:Key="NoChromeButton" TargetType="{x:Type Button}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Grid x:Name="Chrome" Background="{TemplateBinding Background}" SnapsToDevicePixels="true">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" RecognizesAccessKey="True" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Foreground" Value="#ADADAD"/>
+                                <Setter Property="Opacity" TargetName="Chrome" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CallControlButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource NoChromeButton}">
+            <Setter Property="Margin" Value="4" />
+            <Setter Property="Width" Value="70" />
+            <Setter Property="Height" Value="40" />
+        </Style>
+        
+        <Style x:Key="PickupButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource CallControlButtonStyle}">
+            <Setter Property="Command" Value="viewModel:UiCommands.PickUpCommand"/>
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                          Height="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=Height}" 
+                          Width="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=Width}">
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}, Path=Command.Text}" 
+                                   VerticalAlignment="Bottom" HorizontalAlignment="Center" />
+                    </Grid>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <ImageBrush ImageSource="/img/callcontrols/Pick Up 24 d m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="Cursor" Value="No" />
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="true" />
+                        <Condition Binding="{Binding Path=CanPickup}" Value="true" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Pick Up 24 h m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding Path=CanPickup}" Value="true">
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Pick Up 24 n m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="Cursor" Value="Hand" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="DisconnectButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource CallControlButtonStyle}">
+            <Setter Property="Command" Value="viewModel:UiCommands.DisconnectCommand"/>
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                          Height="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=Height}" 
+                          Width="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=Width}">
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}, Path=Command.Text}" 
+                                   VerticalAlignment="Bottom" HorizontalAlignment="Center" />
+                    </Grid>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <ImageBrush ImageSource="/img/callcontrols/Disconnect 24 d m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="Cursor" Value="No" />
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="true" />
+                        <Condition Binding="{Binding Path=CanDisconnect}" Value="true" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Disconnect 24 h m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding Path=CanDisconnect}" Value="true">
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Disconnect 24 n m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="Cursor" Value="Hand" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="MuteButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource CallControlButtonStyle}">
+            <Setter Property="Command" Value="viewModel:UiCommands.MuteCommand"/>
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                          Height="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=Height}" 
+                          Width="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=Width}">
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}, Path=Command.Text}" 
+                                   VerticalAlignment="Bottom" HorizontalAlignment="Center" />
+                    </Grid>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <ImageBrush ImageSource="/img/callcontrols/Mute 24 d m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="Cursor" Value="No" />
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="true" />
+                        <Condition Binding="{Binding Path=CanMute}" Value="true" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Mute 24 h m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding Path=CanMute}" Value="true">
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Mute 24 n m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="Cursor" Value="Hand" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="HoldButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource CallControlButtonStyle}">
+            <Setter Property="Command" Value="viewModel:UiCommands.HoldCommand"/>
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                          Height="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=Height}" 
+                          Width="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=Width}">
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}, Path=Command.Text}" 
+                                   VerticalAlignment="Bottom" HorizontalAlignment="Center" />
+                    </Grid>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <ImageBrush ImageSource="/img/callcontrols/Hold 24 d m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="Cursor" Value="No" />
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="true" />
+                        <Condition Binding="{Binding Path=CanHold}" Value="true" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Hold 24 h m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding Path=CanHold}" Value="true">
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Hold 24 n m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="Cursor" Value="Hand" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="ConferenceButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource CallControlButtonStyle}">
+            <Setter Property="Command" Value="viewModel:UiCommands.ConferenceCommand"/>
+            <Setter Property="Content">
+                <Setter.Value>
+                    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
+                          Height="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=Height}" 
+                          Width="{Binding RelativeSource={RelativeSource AncestorType=Button, Mode=FindAncestor}, Path=Width}">
+                        <TextBlock Text="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Button}}, Path=Command.Text}" 
+                                   VerticalAlignment="Bottom" HorizontalAlignment="Center" />
+                    </Grid>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <ImageBrush ImageSource="/img/callcontrols/Make Conference 24 d m_add.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="Cursor" Value="No" />
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="true" />
+                        <Condition Binding="{Binding Path=CanConference}" Value="true" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Make Conference 24 h m_add.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding Path=CanConference}" Value="true">
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Make Conference 24 n m_add.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="Cursor" Value="Hand" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="DialButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource NoChromeButton}">
+            <Setter Property="Width" Value="16" />
+            <Setter Property="Height" Value="16" />
+            <Setter Property="Command" Value="viewModel:UiCommands.DialCommand"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <ImageBrush ImageSource="/img/callcontrols/Make a Call 16 d m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="Cursor" Value="No" />
+            <Style.Triggers>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsMouseOver}" Value="true" />
+                        <Condition Binding="{Binding Path=QueueViewModel.CanDial}" Value="true" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Make a Call 16 h m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                </MultiDataTrigger>
+                <DataTrigger Binding="{Binding Path=QueueViewModel.CanDial}" Value="true">
+                    <Setter Property="Button.Background">
+                        <Setter.Value>
+                            <ImageBrush ImageSource="/img/callcontrols/Make a Call 16 n m.png" TileMode="None" Stretch="None" AlignmentX="Center" AlignmentY="Top" />
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="Cursor" Value="Hand" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        
+        <Style x:Key="ExpandCollapseToggleStyle"
+           TargetType="{x:Type ToggleButton}">
+            <Setter Property="Focusable"
+              Value="False"/>
+            <Setter Property="Width"
+              Value="19"/>
+            <Setter Property="Height"
+              Value="13"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border Width="19"
+                    Height="13"
+                    Background="Transparent">
+                            <Border Width="9"
+                      Height="9"
+                      BorderThickness="1"
+                      BorderBrush="#FF7898B5"
+                      CornerRadius="1"
+                      SnapsToDevicePixels="true">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0"
+                                       EndPoint="1,1">
+                                        <LinearGradientBrush.GradientStops>
+                                            <GradientStop Color="White"
+                                    Offset=".2"/>
+                                            <GradientStop Color="#FFC0B7A6"
+                                    Offset="1"/>
+                                        </LinearGradientBrush.GradientStops>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Path x:Name="ExpandPath"
+                      Margin="1,1,1,1"
+                      Fill="Black"
+                      Data="M 0 2 L 0 3 L 2 3 L 2 5 L 3 5 L 3 3 L 5 3 L 5 2 L 3 2 L 3 0 L 2 0 L 2 2 Z"/>
+                            </Border>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked"
+                       Value="True">
+                                <Setter Property="Data"
+                        TargetName="ExpandPath"
+                        Value="M 0 2 L 0 3 L 5 3 L 5 2 Z"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <supporting:LevelToIndentConverter x:Key="LevelToIndentConverter"/>
+
+
+        <GridViewColumnCollection x:Key="QueueColumnCollection">
+            <GridViewColumn Header="Conference" Width="auto">
+                <GridViewColumn.CellTemplate>
+                    <DataTemplate>
+                        <DockPanel>
+                            <Grid Width="19">
+                                <ToggleButton x:Name="Expander" 
+                                          Style="{StaticResource ExpandCollapseToggleStyle}" 
+                                          Margin="{Binding Level,Converter={StaticResource LevelToIndentConverter},RelativeSource={RelativeSource AncestorType={x:Type supporting:TreeListViewItem}}}"
+                                          IsChecked="{Binding Path=IsExpanded,RelativeSource={RelativeSource AncestorType={x:Type supporting:TreeListViewItem}}}"
+                                          ClickMode="Press"/>
+                                <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Center" HorizontalAlignment="Center" x:Name="CheckBox"/>
+                            </Grid>
+                            <TextBlock Text="{Binding ConferenceId}" Margin="3,0" x:Name="ConferenceId" />
+                        </DockPanel>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding Path=HasItems,RelativeSource={RelativeSource AncestorType={x:Type supporting:TreeListViewItem}}}" Value="False">
+                                <Setter TargetName="Expander" Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding CanConferenceThisInteraction}" Value="False">
+                                <Setter TargetName="CheckBox" Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                            <DataTrigger Binding="{Binding ConferenceId}" Value="0">
+                                <Setter TargetName="ConferenceId" Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </GridViewColumn.CellTemplate>
+            </GridViewColumn>
+            <GridViewColumn Header="InteractionId" Width="auto" DisplayMemberBinding="{Binding InteractionId}" />
+            <GridViewColumn Header="InteractionType" Width="auto" DisplayMemberBinding="{Binding InteractionType}" />
+            <GridViewColumn Header="State" Width="auto" DisplayMemberBinding="{Binding State}" />
+            <GridViewColumn Header="StateDescription" Width="auto" DisplayMemberBinding="{Binding StateDescription}" />
+            <GridViewColumn Header="UserQueueNames" Width="auto" DisplayMemberBinding="{Binding UserQueueNames}" />
+            <GridViewColumn Header="RemoteAddress" Width="auto" DisplayMemberBinding="{Binding RemoteAddress}" />
+            <GridViewColumn Header="RemoteId" Width="auto" DisplayMemberBinding="{Binding RemoteId}" />
+            <GridViewColumn Header="RemoteName" Width="auto" DisplayMemberBinding="{Binding RemoteName}" />
+            <GridViewColumn Header="LocalAddress" Width="auto" DisplayMemberBinding="{Binding LocalAddress}" />
+            <GridViewColumn Header="LocalId" Width="auto" DisplayMemberBinding="{Binding LocalId}" />
+            <GridViewColumn Header="LocalName" Width="auto" DisplayMemberBinding="{Binding LocalName}" />
+            <!--<GridViewColumn Header="ConferenceId" Width="auto" DisplayMemberBinding="{Binding ConferenceId}" />-->
+        </GridViewColumnCollection>
+
+        <Style TargetType="{x:Type supporting:TreeListViewItem}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type supporting:TreeListViewItem}">
+                        <StackPanel>
+                            <Border Name="Bd"
+                      Background="{TemplateBinding Background}"
+                      BorderBrush="{TemplateBinding BorderBrush}"
+                      BorderThickness="{TemplateBinding BorderThickness}"
+                      Padding="{TemplateBinding Padding}">
+                                <GridViewRowPresenter x:Name="PART_Header" 
+                                      Content="{TemplateBinding Header}" 
+                                      Columns="{Binding Path=Columns,RelativeSource={RelativeSource AncestorType={x:Type supporting:TreeListView}}}" />
+                            </Border>
+                            <ItemsPresenter x:Name="ItemsHost" />
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsExpanded"
+                       Value="false">
+                                <Setter TargetName="ItemsHost"
+                        Property="Visibility"
+                        Value="Collapsed"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="HasHeader"
+                             Value="false"/>
+                                    <Condition Property="Width"
+                             Value="Auto"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="PART_Header"
+                        Property="MinWidth"
+                        Value="75"/>
+                            </MultiTrigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="HasHeader"
+                             Value="false"/>
+                                    <Condition Property="Height"
+                             Value="Auto"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="PART_Header"
+                        Property="MinHeight"
+                        Value="19"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsSelected"
+                       Value="true">
+                                <Setter TargetName="Bd"
+                        Property="Background"
+                        Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}"/>
+                                <Setter Property="Foreground"
+                        Value="{DynamicResource {x:Static SystemColors.HighlightTextBrushKey}}"/>
+                            </Trigger>
+                            <MultiTrigger>
+                                <MultiTrigger.Conditions>
+                                    <Condition Property="IsSelected"
+                             Value="true"/>
+                                    <Condition Property="IsSelectionActive"
+                             Value="false"/>
+                                </MultiTrigger.Conditions>
+                                <Setter TargetName="Bd"
+                        Property="Background"
+                        Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+                                <Setter Property="Foreground"
+                        Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+                            </MultiTrigger>
+                            <Trigger Property="IsEnabled"
+                       Value="false">
+                                <Setter Property="Foreground"
+                        Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+
+        <Style TargetType="{x:Type supporting:TreeListView}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type supporting:TreeListView}">
+                        <Border BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}">
+                            <DockPanel>
+                                <GridViewHeaderRowPresenter Columns="{Binding Path=Columns,RelativeSource={RelativeSource TemplatedParent}}"
+                                            DockPanel.Dock="Top"/>
+                                <ItemsPresenter/>
+                            </DockPanel>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <supporting:CommandBindingCollectionConverter x:Key="RegisterCommandBindingsConverter" />
+    </Window.Resources>
+
+    <Grid>
+        <supporting:CommandBindingHelpers.RegisterCommandBindings>
+            <MultiBinding Converter="{StaticResource RegisterCommandBindingsConverter}">
+                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" Path="DataContext.CommandBindings" />
+                <Binding RelativeSource="{RelativeSource Mode=FindAncestor, AncestorType=Window}" Path="DataContext.QueueViewModel.CommandBindings" />
+            </MultiBinding>
+        </supporting:CommandBindingHelpers.RegisterCommandBindings>
+        <DockPanel>
+            <StackPanel Orientation="Vertical" DockPanel.Dock="Left" Width="240">
+                <GroupBox>
+                    <GroupBox.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding CicConnectionStateImage}" Width="16" Height="16">
+                                <Image.ToolTip>
+                                    <TextBlock MaxWidth="200" TextWrapping="Wrap" Text="{Binding ConnectionStateString}" />
+                                </Image.ToolTip>
+                            </Image>
+                            <TextBlock>CIC Authentication</TextBlock>
+                        </StackPanel>
+                    </GroupBox.Header>
+                    <StackPanel Orientation="Vertical">
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource AuthLabels}">Username</TextBlock>
+                            <TextBox Style="{StaticResource AuthBoxStyle}" Text="{Binding Path=CicUsername, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource AuthLabels}">Password</TextBlock>
+                            <PasswordBox Style="{StaticResource AuthPwBoxStyle}" Name="CicPasswordBox" PasswordChanged="CicPasswordBox_OnPasswordChanged" />
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource AuthLabels}">Station</TextBlock>
+                            <TextBox Style="{StaticResource AuthBoxStyle}" Text="{Binding Path=CicStation, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
+                        <DockPanel>
+                            <TextBlock Style="{StaticResource AuthLabels}">Server</TextBlock>
+                            <TextBox Style="{StaticResource AuthBoxStyle}" Text="{Binding Path=CicServer, UpdateSourceTrigger=PropertyChanged}" />
+                        </DockPanel>
+                    </StackPanel>
+                </GroupBox>
+                <Button Command="viewModel:UiCommands.LogInCommand" Content="{Binding ConnectButtonText}" Style="{StaticResource ConnectButtonStyle}" />
+            </StackPanel>
+
+            <GroupBox Header="Interaction Queue">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="180" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Grid.Row="0">
+                        <Label DockPanel.Dock="Left" VerticalAlignment="Center">Dial: </Label>
+                        <Button Style="{StaticResource DialButtonStyle}" DockPanel.Dock="Right" VerticalAlignment="Center" Margin="4,0" />
+                        <TextBox VerticalAlignment="Center" Margin="2,0" Text="{Binding Path=QueueViewModel.DialString, UpdateSourceTrigger=PropertyChanged}">
+                            <TextBox.InputBindings>
+                                <KeyBinding Command="viewModel:UiCommands.DialCommand" Key="Enter"/>
+                                <KeyBinding Command="viewModel:UiCommands.DialCommand" Key="Return"/>
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </DockPanel>
+                    <Border Grid.Row="1" DataContext="{Binding Path=QueueViewModel}"
+                            BorderBrush="DarkGray" BorderThickness="1" Background="#F9F9F9">
+                        <DockPanel>
+
+                            <StackPanel Orientation="Horizontal" DockPanel.Dock="Bottom">
+                                <Button Style="{StaticResource PickupButtonStyle}" />
+                                <Button Style="{StaticResource MuteButtonStyle}" />
+                                <Button Style="{StaticResource HoldButtonStyle}" />
+                                <Button Style="{StaticResource ConferenceButtonStyle}" />
+                                <Button Style="{StaticResource DisconnectButtonStyle}" />
+                            </StackPanel>
+
+                            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" BorderThickness="0">
+                                <supporting:TreeListView ItemsSource="{Binding Interactions}" VerticalAlignment="Stretch" BorderThickness="0" 
+                                                            SelectedItemChanged="TreeView_OnSelectedItemChanged" Columns="{StaticResource QueueColumnCollection}">
+                                    <supporting:TreeListView.ItemTemplate>
+                                        <HierarchicalDataTemplate ItemsSource="{Binding ConferenceParties}">
+                                            <GridViewRowPresenter Content="{Binding}" Columns="{StaticResource QueueColumnCollection}" />
+                                        </HierarchicalDataTemplate>
+                                    </supporting:TreeListView.ItemTemplate>
+                                    <supporting:TreeListView.ItemContainerStyle>
+                                        <Style TargetType="supporting:TreeListViewItem" BasedOn="{StaticResource {x:Type supporting:TreeListViewItem}}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=IsOtherConferenceParty}" Value="true">
+                                                    <Setter Property="Background" Value="#F5F5F5" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Path=IsDisconnected}" Value="true">
+                                                    <Setter Property="Foreground" Value="Gray" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </supporting:TreeListView.ItemContainerStyle>
+                                </supporting:TreeListView>
+                                <!--<ListView x:Name="InteractionsListView" ItemsSource="{Binding Path=Interactions}" BorderThickness="0"
+                                      SelectedItem="{Binding Path=SelectedInteraction, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      MouseLeftButtonDown="InteractionsListView_OnMouseLeftButtonDown">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border>
+                                                <StackPanel>
+                                                    <Border Name="presenter"
+                                                                    Background="Red" Margin="4"
+                                                                    BorderBrush="Turquoise"
+                                                                    BorderThickness="2"
+                                                                    Padding="6">
+                                                        <GridViewRowPresenter />
+                                                    </Border>
+                                                    <Border Name="details" Visibility="Visible" Margin="5"
+                                                                    BorderBrush="Black" BorderThickness="2">
+                                                        <StackPanel Margin="5">
+                                                            <ListView ItemsSource="{Binding ElementName=InteractionsListView, Path=SelectedItem.ConferenceParties}">
+                                                                <ListView.View>
+                                                                    <GridView>
+                                                                        <GridViewColumn Header="InteractionId" Width="auto" DisplayMemberBinding="{Binding InteractionId}" />
+                                                                        <GridViewColumn Header="InteractionType" Width="auto" DisplayMemberBinding="{Binding InteractionType}" />
+                                                                        <GridViewColumn Header="State" Width="auto" DisplayMemberBinding="{Binding State}" />
+                                                                        <GridViewColumn Header="StateDescription" Width="auto" DisplayMemberBinding="{Binding StateDescription}" />
+                                                                        <GridViewColumn Header="UserQueueNames" Width="auto" DisplayMemberBinding="{Binding UserQueueNames}" />
+                                                                        <GridViewColumn Header="RemoteAddress" Width="auto" DisplayMemberBinding="{Binding RemoteAddress}" />
+                                                                        <GridViewColumn Header="RemoteId" Width="auto" DisplayMemberBinding="{Binding RemoteId}" />
+                                                                        <GridViewColumn Header="RemoteName" Width="auto" DisplayMemberBinding="{Binding RemoteName}" />
+                                                                        <GridViewColumn Header="LocalAddress" Width="auto" DisplayMemberBinding="{Binding LocalAddress}" />
+                                                                        <GridViewColumn Header="LocalId" Width="auto" DisplayMemberBinding="{Binding LocalId}" />
+                                                                        <GridViewColumn Header="LocalName" Width="auto" DisplayMemberBinding="{Binding LocalName}" />
+                                                                        <GridViewColumn Header="ConferenceId" Width="auto" DisplayMemberBinding="{Binding ConferenceId}" />
+                                                                    </GridView>
+                                                                </ListView.View>
+                                                            </ListView>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </StackPanel>
+                                            </Border>
+                                            <DataTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding ElementName=InteractionsListView, Path=SelectedItem}" Value="{x:Null}">
+                                                    <Setter TargetName="details" Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </DataTemplate.Triggers>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="IsSelected" Value="{Binding Path=IsSelected}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=IsDisconnected}" Value="true">
+                                                    <Setter Property="Foreground" Value="Gray" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridViewColumn Header="InteractionId" Width="auto" DisplayMemberBinding="{Binding InteractionId}" />
+                                            <GridViewColumn Header="InteractionType" Width="auto" DisplayMemberBinding="{Binding InteractionType}" />
+                                            <GridViewColumn Header="State" Width="auto" DisplayMemberBinding="{Binding State}" />
+                                            <GridViewColumn Header="StateDescription" Width="auto" DisplayMemberBinding="{Binding StateDescription}" />
+                                            <GridViewColumn Header="UserQueueNames" Width="auto" DisplayMemberBinding="{Binding UserQueueNames}" />
+                                            <GridViewColumn Header="RemoteAddress" Width="auto" DisplayMemberBinding="{Binding RemoteAddress}" />
+                                            <GridViewColumn Header="RemoteId" Width="auto" DisplayMemberBinding="{Binding RemoteId}" />
+                                            <GridViewColumn Header="RemoteName" Width="auto" DisplayMemberBinding="{Binding RemoteName}" />
+                                            <GridViewColumn Header="LocalAddress" Width="auto" DisplayMemberBinding="{Binding LocalAddress}" />
+                                            <GridViewColumn Header="LocalId" Width="auto" DisplayMemberBinding="{Binding LocalId}" />
+                                            <GridViewColumn Header="LocalName" Width="auto" DisplayMemberBinding="{Binding LocalName}" />
+                                            <GridViewColumn Header="ConferenceId" Width="auto" DisplayMemberBinding="{Binding ConferenceId}" />
+                                        </GridView>
+                                    </ListView.View>
+                                </ListView>-->
+                            </ScrollViewer>
+                        </DockPanel>
+                    </Border>
+                    <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" VerticalAlignment="Top" Height="6" Margin="0,2" Background="LightGray" />
+                    <ScrollViewer x:Name="Log" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" 
+                                  ScrollChanged="Log_OnScrollChanged" Margin="0,10,0,0" Grid.Row="2">
+                        <Border BorderBrush="LightGray">
+                            <TextBox Text="{Binding RelativeSource={RelativeSource AncestorType=Window, Mode=FindAncestor}, Path=DataContext.Log}"
+                               Style="{StaticResource LogStyle}" BorderThickness="0" />
+                        </Border>
+                    </ScrollViewer>
+                </Grid>
+            </GroupBox>
+        </DockPanel>
+    </Grid>
+</Window>

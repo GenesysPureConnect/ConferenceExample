@@ -1,0 +1,11 @@
+IC [2014-05-01 10:40:02.108536]: Welcome to IC!
+IC [2014-05-01 10:40:02.1751012]: Interaction transferred to Marketing.
+IC [2014-05-01 10:40:02.3395564]: All agents are busy assisting other customers.
+IC [2014-05-01 10:40:02.3473876]: Your position in queue is 1.
+IC [2014-05-01 10:40:02.353261]: Your estimated wait time is approximately one minute.
+IC [2014-05-01 10:40:02.3650078]: Your position in queue and estimated wait time will be updated in approximately three minutes.
+IC [2014-05-01 10:40:02.3718601]: To leave a voicemail, type YES and click the send button now.  Otherwise, please continue to hold and the next available agent will assist you as soon as possible.
+IC [2014-05-01 10:40:11.9670379]: test has joined the conversation.
+tim.awesome [2014-05-01 10:40:19.9866834]: teast
+test [2014-05-01 10:40:24.046331]: asdf
+IC [2014-05-01 10:40:27.0930241]: test has left the conversation.

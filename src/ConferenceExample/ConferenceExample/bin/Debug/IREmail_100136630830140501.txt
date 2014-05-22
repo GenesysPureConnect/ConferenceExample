@@ -1,0 +1,29 @@
+From   : 
+To     : MailUser_Marketing, 
+Cc     : 
+Subject: IC Voicemail:  from Interactive Intelligence (317) 715-8561  - 5 seconds
+
+Interactive Intelligence
+Interactive Intelligence, Inc.
+7601 Interactive Way
+Indianapolis, IN 46278
+USA
+
+(317) 715-8561
+
+10:47:00: Initializing
+10:47:00: Offering
+10:47:00: ANI:  3177158561
+10:47:00: DNIS:  5000
+10:47:00: Call answered
+10:47:00: 5000
+10:47:02: Offering
+10:47:02: Entered Workgroup Marketing
+10:47:02: Voice Mail
+10:47:14: Disconnected [Remote Disconnect]
+10:47:14: Caller has recorded and sent a voicemail message
+
+5 seconds
+
+ 
+[ID:1001365322#3177158561]
